@@ -2,10 +2,12 @@
     <div id="movie-list">
         <div v-if="filteredMovies.length">
             <movie-item v-for="movie in filteredMovies" 
-                        v-bind:movie="movie.movie" 
-                        v-bind:sessions="movie.sessions"
-                        v-bind:day="day"
-                        v-bind:time="time">
+                        v-bind:movie="movie.movie">
+                <div class="movie-sessions">
+                    <div v-for="session in filteredSessions(movie.sessions)" class="session-time-wrapper">
+                        <div class="session-time">{{ formatSessionTime(session.time) }}</div>
+                    </div>
+                </div>
             </movie-item>
         </div>
         <div v-else-if="movies.length" class="no-results">
@@ -54,9 +56,12 @@
                     return this.$moment(session.time).hour() < 18;
                 }
             },
+            formatSessionTime(input) {
+                return this.$moment(input).format('h:mm A');
+            },
             filteredSessions(sessions) {
                 return sessions.filter(session =>  {
-                    return this.$moment(session.time).isSame(this.day, 'day');
+                    return this.sessionPassesTimeFilter(session);
                 });
             }
         },
